@@ -1,5 +1,18 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+
+
 data "aws_ami" "app_ami" {
-    provider = aws
     most_recent = true
     owners = ["099720109477"] # ubuntu #if owner is amazon add "amazon"
 
@@ -10,7 +23,6 @@ data "aws_ami" "app_ami" {
 }
 
 resource "aws_instance" "nodejs-server" {
-  provider = aws
   #count = 1
   ami = data.aws_ami.app_ami.id
   instance_type = var.instance_type
@@ -32,12 +44,10 @@ resource "aws_instance" "nodejs-server" {
 }
 
 resource "aws_iam_instance_profile" "EC2_access_ECR" {
-  provider = aws
   name = "ec2_access_ecr"
   role = "ec2_access_ecr"
 }
 resource "aws_security_group" "nodejs" {
-  provider = aws
   egress = [ 
     {
         cidr_blocks = ["0.0.0.0/0"]
@@ -100,7 +110,6 @@ resource "aws_security_group" "nodejs" {
 }
 
 resource "aws_key_pair" "deployer" {
-  provider = aws
   key_name = var.key_name
   public_key = var.public_key
 }
