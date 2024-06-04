@@ -50,8 +50,8 @@ resource "aws_security_group" "nodejs" {
         self = false
         to_port = 0
     }
-   ]
-   ingress = [
+  ]
+  ingress = [
     {
         cidr_blocks = ["0.0.0.0/0"]
         description = "allow icmp"
@@ -62,7 +62,7 @@ resource "aws_security_group" "nodejs" {
         security_groups = []
         self = false
         to_port = 0
-    }
+    },
     {
         cidr_blocks = ["0.0.0.0/0"]
         description = "allow ssh"
@@ -73,7 +73,7 @@ resource "aws_security_group" "nodejs" {
         security_groups = []
         self = false
         to_port = 22
-    }
+    },   
     {
         cidr_blocks = ["0.0.0.0/0"]
         description = "allow http"
@@ -84,7 +84,7 @@ resource "aws_security_group" "nodejs" {
         security_groups = []
         self = false
         to_port = 80
-    }
+    },
         {
         cidr_blocks = ["0.0.0.0/0"]
         description = "custom port"
