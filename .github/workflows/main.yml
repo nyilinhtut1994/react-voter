@@ -26,7 +26,7 @@ jobs:
           terraform_wrapper: false
       - name: Terraform init
         id: init
-        run: terraform init -backend-config="bucket=$TF_STATE_BUCKET_NAM" -backend-config="region=ap-southeast-1"
+        run: terraform init -backend-config="bucket=$TF_STATE_BUCKET_NAME" -backend-config="region=ap-southeast-1"
       - name: Terraform Plan
         id: plan
         run: |-
