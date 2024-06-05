@@ -6,6 +6,7 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
   SSH_USER: ${{ vars.SSH_USER }}
+  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
   IMAGE_NAME: ${{ vars.IMAGE_NAME }}
 
 on:
@@ -33,7 +34,45 @@ jobs:
           aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
     
       - name: build the docker image
-        run: docker build -t $IMAGE_NAME:latest .
+        run: docker build -t $CONTAINER_NAME/$IMAGE_NAME:latest .
 
       - name: push the image to ECR
-        run: docker push $IMAGE_NAME:latest
+        run: docker push $CONTAINER_NAME/$IMAGE_NAME:latest
+    
+  deploy-dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.6
+    
+      - name: Create SSH key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private.key
+          sudo chmod 400 private.key
+          eval $(ssh-agent -s)
+          ssh-add private.key
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh-keyscan -H $TARGET_HOST >> ~/.ssh/known_hosts 
+        
+      - name: set up ansible
+        run: |
+          sudo apt-get update -y
+          sudo apt-get upgrade -y
+          sudo apt-get install -y ansible
+
+      - name: Create inventory file
+        run: |
+          echo "server ansible_host=$TARGET_HOST ansible_user=$SSH_USER ansible_ssh_private_key_file=private.key" > inventory
+
+      - name: Deploy with Ansible
+        run: |
+          ansible-playbook -i inventory \
+          --extra-vars "image_name=$IMAGE_NAME" \
+          --extra-vars "domain_name=$DOMAIN_NAME" \
+          --extra-vars "container_name=$CONTAINER_NAME" \
+          --extra-vars "aws_account_id=$AWS_ACCOUNT_ID" \
+          --extra-vars "region=$REGION" \
+          --extra-vars "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" \
+          devops/playbook.yml

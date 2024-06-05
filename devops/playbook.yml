@@ -1,0 +1,93 @@
+---
+- name: run react-voter app
+  hosts: all
+  become: yes
+  vars:
+
+
+  tasks:
+    - name: update the server
+      apt:
+        update_cache: yes
+
+    - name: install docker
+      apt:
+        name: docker.io
+        state: latest
+      notify: start the docker
+
+    - name: install nginx
+      apt:
+        name: nginx
+        state: latest
+      notify: start the nginx
+
+    - name: login to the ECR
+      ansible.builtin.include_role:
+        ansible-aws-ecr-login
+      vars:
+        aws_ecr_login_repository: {{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com
+
+    - name: pull the image
+      docker_image:
+        name:  "{{ CONTAINER_NAME }}"/"{{ IMAGE_NAME }}"
+        source: pull
+    
+    - name: run the ECR container
+      docker_container:
+        name: "{{ CONTAINER_NAME }}"
+        image: "{{ IMAGE_NAME }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "3001:3000"
+
+    - name: wait for the container to start
+      wait_for:
+        host: localhost
+        port: 3001
+        delay: 5
+        timeout: 60
+
+
+    - name: wait for the container to start
+      wait_for:
+        host: localhost
+        port: 3001
+        delay: 5
+        timeout: 60
+    
+    - name: check if nginx config file exit
+      stat: 
+        path: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
+      register: nginx_config
+
+    - name: configure nginx
+      template:
+        src: nginx.conf.j2
+        dest: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
+      when: not nginx_config.stat.exists
+
+    - name: Enable nginx site 
+      file:
+        src: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
+        dest: "/etc/nginx/sites-enabled/"
+        state: link
+      notify: reload nginx
+      
+  handlers:
+    - name: start the docker
+      service:
+        name: docker
+        state: started
+
+    - name: start the nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+
