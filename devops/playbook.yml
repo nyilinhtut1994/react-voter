@@ -52,8 +52,8 @@
     
     - name: run the ECR container
       docker_container:
-        name: "{{ CONTAINER_NAME }}"
-        image: "{{ IMAGE_NAME }}"
+        name: react-voter
+        image: "{{ CONTAINER_NAME }}/{{ IMAGE_NAME }}"
         state: started
         restart_policy: always
         ports:
