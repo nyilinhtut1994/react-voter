@@ -31,11 +31,11 @@
       ansible.builtin.include_role:
         ansible-aws-ecr-login
       vars:
-        aws_ecr_login_repository: "{{ AWS_ACCOUNT_ID }}".dkr.ecr."{{ REGION }}".amazonaws.com
+        aws_ecr_login_repository: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com"
 
     - name: pull the image
       docker_image:
-        name:  "{{ CONTAINER_NAME }}"/"{{ IMAGE_NAME }}"
+        name:  "{{ CONTAINER_NAME }}/{{ IMAGE_NAME }}"
         source: pull
     
     - name: run the ECR container
