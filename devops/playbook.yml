@@ -3,6 +3,11 @@
   hosts: all
   become: yes
   vars:
+    IMAGE_NAME: "{{ image_name }}"
+    AWS_ACCOUNT_ID: "{{ aws_account_id }}"
+    REGION: "{{ region }}"
+    DOMAIN_NAME: "{{ domain_name }}"
+    CONTAINER_NAME: "{{ container_name }}"
 
 
   tasks:
@@ -26,7 +31,7 @@
       ansible.builtin.include_role:
         ansible-aws-ecr-login
       vars:
-        aws_ecr_login_repository: {{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com
+        aws_ecr_login_repository: "{{ AWS_ACCOUNT_ID }}".dkr.ecr."{{ REGION }}".amazonaws.com
 
     - name: pull the image
       docker_image:

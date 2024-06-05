@@ -27,3 +27,5 @@ yarn-error.log*
 terraform/
 terraform/*
 terr*
+
+react-v*
