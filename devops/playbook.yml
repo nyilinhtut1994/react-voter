@@ -28,13 +28,13 @@
         state: latest
       notify: start the nginx
 
-    - name: Get instance profile info
-      amazon.aws.aws_caller_info:
-      register: aws_info
+    # - name: Get instance profile info
+    #   amazon.aws.aws_caller_info:
+    #   register: aws_info
 
-    #- name: Get ECR token
-      #shell: "aws ecr get-login-password --region {{ REGION }}"
-      #register: ecr_token
+    # #- name: Get ECR token
+    #   #shell: "aws ecr get-login-password --region {{ REGION }}"
+    #   #register: ecr_token
 
     - name: Log into ECR registry
       docker_login:
@@ -42,9 +42,8 @@
         debug: yes
         username: "AWS"
         password: "{{ ECR_TOKEN_STDOUT }}"
-        #you can get it by using "aws ecr get-login-password"
+         #you can get it by using "aws ecr get-login-password"
         reauthorize: yes
-
 
     - name: pull the image
       docker_image:
