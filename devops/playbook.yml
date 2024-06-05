@@ -29,7 +29,7 @@
 
     - name: login to the ECR
       ansible.builtin.include_role:
-        ansible-aws-ecr-login
+        name: ansible-aws-ecr-login
       vars:
         aws_ecr_login_repository: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com"
 
