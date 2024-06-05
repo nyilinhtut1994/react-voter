@@ -80,6 +80,6 @@ jobs:
           --extra-vars "container_name=$CONTAINER_NAME" \
           --extra-vars "aws_account_id=$AWS_ACCOUNT_ID" \
           --extra-vars "region=$REGION" \
-          --extra-vars "ecr_token.stdout=$ECR_TOKEN_STDOUT" \
+          --extra-vars "ecr_token_stdout=$ECR_TOKEN_STDOUT" \
           --extra-vars "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" \
           devops/playbook.yml
