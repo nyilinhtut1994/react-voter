@@ -88,7 +88,7 @@
     - name: Enable nginx site 
       file:
         src: "/etc/nginx/sites-available/{{ DOMAIN_NAME }}"
-        dest: "/etc/nginx/sites-enabled/"
+        dest: "/etc/nginx/sites-enable/{{ DOMAIN_NAME }}"
         state: link
       notify: reload nginx
       
