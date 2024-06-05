@@ -8,6 +8,8 @@ env:
   SSH_USER: ${{ vars.SSH_USER }}
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
   IMAGE_NAME: ${{ vars.IMAGE_NAME }}
+  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+  TARGET_HOST: ${{ vars.TARGET_HOST}}
 
 on:
   push:
@@ -40,6 +42,7 @@ jobs:
         run: docker push $CONTAINER_NAME/$IMAGE_NAME:latest
     
   deploy-dockerfile:
+    needs: build-dockerfile
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
