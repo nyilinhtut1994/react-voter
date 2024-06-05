@@ -8,6 +8,7 @@
     REGION: "{{ region }}"
     DOMAIN_NAME: "{{ domain_name }}"
     CONTAINER_NAME: "{{ container_name }}"
+    ECR_TOKEN_STDOUT: "{{ ecr_token_stdout }}"
 
 
   tasks:
@@ -27,11 +28,26 @@
         state: latest
       notify: start the nginx
 
-    - name: login to the ECR
-      ansible.builtin.include_role:
-        name: ansible-aws-ecr-login
-      vars:
-        aws_ecr_login_repository: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com"
+    - name: Get instance profile info
+      amazon.aws.aws_caller_info:
+      register: aws_info
+
+    - set_fact:
+      ecr_registry_url: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com"
+
+    - name: Get ECR token
+      shell: "aws ecr get-login-password --region {{ REGION }}"
+      register: ecr_token
+
+    - name: Log into ECR registry
+      docker_login:
+        registry_url: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com"
+        debug: yes
+        username: "AWS"
+        password: "{{ ECR_TOKEN_STDOUT }}"
+        #you can get it by using "aws ecr get-login-password"
+        reauthorize: yes
+
 
     - name: pull the image
       docker_image:
