@@ -1,54 +1,36 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-
-}
-
-provider "aws" {
-  region = var.region
-}
-
-
 data "aws_ami" "app_ami" {
+    provider = aws.main
     most_recent = true
     owners = ["099720109477"] # ubuntu #if owner is amazon add "amazon"
 
     filter {
         name = "name"
-        values = ["ubuntu/images/*ubuntu-*-22.04-*"]
+        values = ["ubuntu/images/*ubuntu-*"]
     }
 }
 
 resource "aws_instance" "nodejs-server" {
+  provider = aws.main
   #count = 1
   ami = data.aws_ami.app_ami.id
   instance_type = var.instance_type
-  key_name = aws_key_pair.deployer.key_name
-  connection {
-    type = "ssh"
-    host = self.public_ip
-    user = "ubuntu"
-    private_key = var.private_key
-    timeout = "5m"
-  }
+  key_name = var.keyname
   availability_zone = "ap-southeast-1a"
-  vpc_security_group_ids = aws_security_group.nodejs
+  vpc_security_group_ids = [aws_security_group.nodejs.id]
   iam_instance_profile = aws_iam_instance_profile.EC2_access_ECR.name
 
   tags = {
-    "name" = "nodejs-server"
+    Name = "nodejs-server"
   }
 }
 
 resource "aws_iam_instance_profile" "EC2_access_ECR" {
-  name = "ec2_access_ecr"
+  provider = aws.main
+  name = "EC2_to_ECR"
   role = "ec2_access_ecr"
 }
 resource "aws_security_group" "nodejs" {
+  provider = aws.main
   egress = [ 
     {
         cidr_blocks = ["0.0.0.0/0"]
@@ -108,9 +90,4 @@ resource "aws_security_group" "nodejs" {
         to_port = 8080
     }
    ]
-}
-
-resource "aws_key_pair" "deployer" {
-  key_name = var.key_name
-  public_key = var.public_key
 }

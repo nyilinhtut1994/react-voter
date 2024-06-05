@@ -7,14 +7,6 @@ variable "region" {
   default = "ap-southeast-1"
 }
 
-variable "public_key" {
-  
-}
-
-variable "private_key" {
-  
-}
-
-variable "key_name" {
-  
+variable "keyname" {
+  default = "DevOps"
 }
