@@ -32,9 +32,6 @@
       amazon.aws.aws_caller_info:
       register: aws_info
 
-    - set_fact:
-      ecr_registry_url: "{{ AWS_ACCOUNT_ID }}.dkr.ecr.{{ REGION }}.amazonaws.com"
-
     - name: Get ECR token
       shell: "aws ecr get-login-password --region {{ REGION }}"
       register: ecr_token
