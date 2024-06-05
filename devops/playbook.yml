@@ -32,9 +32,9 @@
       amazon.aws.aws_caller_info:
       register: aws_info
 
-    - name: Get ECR token
-      shell: "aws ecr get-login-password --region {{ REGION }}"
-      register: ecr_token
+    #- name: Get ECR token
+      #shell: "aws ecr get-login-password --region {{ REGION }}"
+      #register: ecr_token
 
     - name: Log into ECR registry
       docker_login:
